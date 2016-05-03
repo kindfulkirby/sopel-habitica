@@ -128,7 +128,7 @@ def status(bot, trigger):
                 user = requests.get("https://habitica.com/api/v2/user", headers=headers)
 
         if user.status_code != 200:
-            raise requests.ConnectionError
+            bot.say("No connection to Habitica. Please try again later.")
 
         hp = str(round(user.json()["stats"]["hp"], 2))
         mp = str(int(user.json()["stats"]["mp"]))
@@ -151,7 +151,7 @@ def status(bot, trigger):
                 + color(" " + name + " ", "white", "grey") + " "
                 + color(u"♥ " + hp + " HP", "red") + sep
                 + color(u"🔥 "+ mp + " MP", "blue") + sep
-                + color(u"🌟 " + xp + " XP", "yellow") + sep
+                + color(u"⭐ " + xp + " XP", "yellow") + sep
                 + color(u"⛁ " + gp + " Gold", "olive")
         )
 
@@ -163,7 +163,7 @@ def read_chat(bot):
     chat = requests.get("https://habitica.com/api/v2/groups/party/chat", headers=HabIRC.auth)
 
     if chat.status_code != 200:
-        raise requests.ConnectionError
+        return
 
     for channel in bot.config.habirc.channels:
 
