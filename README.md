@@ -1,6 +1,8 @@
 # habirc
 Sopel IRC bot module for Habitica
 
+The chosen unicode icons look best with [good emoji support](https://github.com/eosrei/emojione-color-font)
+
 Working so far:
 
 * Echoes Habitica party chat into IRC
