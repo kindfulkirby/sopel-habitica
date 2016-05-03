@@ -137,7 +137,7 @@ def status(bot, trigger):
 
         sep = " | "
 
-        bot.reply(color(" " + name + " ", "white", "grey") + " " + color(hp + " HP", "red") + sep + color(mp + " MP", "blue")
+        bot.say(color(" " + name + " ", "white", "grey") + " " + color(hp + " HP", "red") + sep + color(mp + " MP", "blue")
                   + sep + color(xp + " XP", "yellow") + sep + color(gp + " Gold", "olive"))
 
     else:
