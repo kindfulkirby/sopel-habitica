@@ -149,10 +149,10 @@ def status(bot, trigger):
 
         bot.say("Status for "
                 + color(" " + name + " ", "white", "grey") + " "
-                + color(u"♥ " + hp + " HP", "red") + sep
-                + color(u"🔥 "+ mp + " MP", "blue") + sep
-                + color(u"⭐ " + xp + " XP", "yellow") + sep
-                + color(u"⛁ " + gp + " Gold", "olive")
+                + color(bold(u"♥ ") + hp + " HP", "red") + sep
+                + color(bold(u"🔥 ")+ mp + " MP", "blue") + sep
+                + color(bold(u"⭐ ") + xp + " XP", "yellow") + sep
+                + color(bold(u"⛁ ") + gp + " Gold", "olive")
         )
 
     else:
