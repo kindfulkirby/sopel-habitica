@@ -70,7 +70,8 @@ def status(bot, trigger):
         else:
             bot.reply("Please do not configure me in a public channel!")
 
-    elif trigger.group(3) == "key" and trigger.group(4) is not "DANGER":
+    elif (trigger.group(3) == "key" and trigger.group(4) != "DANGER") or \
+            (trigger.group(3) == "key" and trigger.group(4) == "DANGER" and trigger.group(5) is None):
         if trigger.is_privmsg:
             bot.msg(trigger.nick, "Please note that the API Token can be used as a " + color("password", "red")
                     + " and you should never give it to anyone you don't trust!")
@@ -166,6 +167,6 @@ def read_chat(bot):
                     bot.msg(channel, color(chat.json()[line]["text"][1:-1], "pink"))
                 else:
                     user = color(" " + chat.json()[line]["user"] + " ", "white", "grey")
-                    bot.msg(channel, user + chat.json()[line]["text"])
+                    bot.msg(channel, user + " " + chat.json()[line]["text"])
 
             HabIRC.last_timestamp = int(chat.json()[0]["timestamp"])
