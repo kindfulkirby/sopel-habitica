@@ -7,7 +7,7 @@ import re
 
 class HabIRC():
     auth = {}
-    last_timestamp = 0
+    last_timestamp = {}
     api_regex = re.compile(ur'[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}')
 
 
@@ -20,7 +20,15 @@ class HabircSection(StaticSection):
 
 def setup(bot):
     bot.config.define_section('habirc', HabircSection)
+
     HabIRC.auth = {"x-api-key": bot.config.habirc.api_key, "x-api-user": bot.config.habirc.api_user}
+
+    for channel in bot.config.habirc.channels:
+        last_timestamp = bot.db.get_channel_value(channel, "last_timestamp")
+        if last_timestamp is None:
+            HabIRC.last_timestamp[channel] = 0
+        else:
+            HabIRC.last_timestamp[channel] = int(last_timestamp)
 
 
 @sopel.module.commands('status')
@@ -158,7 +166,7 @@ def read_chat(bot):
 
                 timestamp = int(chat.json()[line]["timestamp"])
 
-                if timestamp <= HabIRC.last_timestamp:
+                if timestamp <= HabIRC.last_timestamp[channel]:
                     continue
 
                 uuid = chat.json()[line]["uuid"]
@@ -169,4 +177,5 @@ def read_chat(bot):
                     user = color(" " + chat.json()[line]["user"] + " ", "white", "grey")
                     bot.msg(channel, user + " " + chat.json()[line]["text"])
 
-            HabIRC.last_timestamp = int(chat.json()[0]["timestamp"])
+            HabIRC.last_timestamp[channel] = int(chat.json()[0]["timestamp"])
+            bot.db.set_channel_value(channel, "last_timestamp", HabIRC.last_timestamp[channel])
