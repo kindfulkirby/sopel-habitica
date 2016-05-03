@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 import sopel.module
 import requests
 from sopel.config.types import StaticSection, ValidatedAttribute, ListAttribute
@@ -145,8 +147,13 @@ def status(bot, trigger):
 
         sep = " | "
 
-        bot.say(color(" " + name + " ", "white", "grey") + " " + color(hp + " HP", "red") + sep + color(mp + " MP", "blue")
-                  + sep + color(xp + " XP", "yellow") + sep + color(gp + " Gold", "olive"))
+        bot.say("Status for "
+                + color(" " + name + " ", "white", "grey") + " "
+                + color(u"♥ " + hp + " HP", "red") + sep
+                + color(u"🔥 "+ mp + " MP", "blue") + sep
+                + color(u"🌟 " + xp + " XP", "yellow") + sep
+                + color(u"⛁ " + gp + " Gold", "olive")
+        )
 
     else:
         bot.reply("Unknown command")
