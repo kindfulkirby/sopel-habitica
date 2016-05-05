@@ -1,6 +1,9 @@
 # habirc
 [Sopel][1] IRC bot module for [Habitica][2]
 
+**Under Heavy Development**  
+Not quite ready for deployment.
+
 The chosen unicode icons look best with [good emoji support][3].
 
 Working so far:
