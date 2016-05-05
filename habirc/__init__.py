@@ -1,10 +1,13 @@
 # -*- coding: utf8 -*-
 
-import sopel.module
+from __future__ import absolute_import
+
 import requests
+import re
+
+import sopel.module
 from sopel.config.types import StaticSection, ValidatedAttribute, ListAttribute
 from sopel.formatting import color, bold
-import re
 
 
 class HabIRC:
@@ -108,7 +111,8 @@ def show_status(bot, trigger):
             + color(bold(u"⚡ ") + mp + " MP", "blue") + sep
             + color(bold(u"⭐ ") + xp + " XP", "yellow") + sep
             + color(bold(u"⛁ ") + gp + " Gold", "olive")
-            )
+    )
+
 
 def get_name_colors(user):
     colors = {
@@ -126,7 +130,6 @@ def get_name_colors(user):
     }
 
     level = 0
-
 
     if "level" in user["contributor"]:
         level = user["contributor"]["level"]
@@ -215,6 +218,7 @@ def start_configuration(bot, trigger):
         bot.reply("Opening query for configuration.")
     bot.msg(trigger.nick, "Please give me your Habitica User ID with '.status user <User ID>'.")
 
+
 @sopel.module.interval(60)
 def read_chat(bot):
     chat = requests.get("https://habitica.com/api/v2/groups/habitrpg/chat", headers=HabIRC.auth)
@@ -240,7 +244,7 @@ def read_chat(bot):
                 else:
                     user = requests.get("https://habitica.com/api/v2/members/" + uuid, headers=HabIRC.auth)
 
-                    name =  " " + user.json()["profile"]["name"] + " "
+                    name = " " + user.json()["profile"]["name"] + " "
                     colors = get_name_colors(user.json())
                     message = chat.json()[line]["text"]
                     bot.msg(channel, color(name, colors[0], colors[1]) + " " + message)
