@@ -3,11 +3,11 @@
 import sopel.module
 import requests
 from sopel.config.types import StaticSection, ValidatedAttribute, ListAttribute
-from sopel.formatting import color, bold, underline
+from sopel.formatting import color, bold
 import re
 
 
-class HabIRC():
+class HabIRC:
     auth = {}
     last_timestamp = {}
     api_regex = re.compile(ur'[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}')
@@ -34,133 +34,190 @@ def setup(bot):
 
 
 @sopel.module.commands('status')
-def status(bot, trigger):
+def status_command(bot, trigger):
     """Replies with the configured character's status (HP, MP, XP & Gold)"""
 
-    if trigger.group(3) == "add":
-        if not trigger.is_privmsg:
-            bot.reply("Opening query for configuration")
-        bot.msg(trigger.nick, "Please give me your Habitica User ID with '.status user <User ID>'")
+    args = [trigger.group(3), trigger.group(4), trigger.group(5)]
 
-    elif trigger.group(3) == "del":
-        if bot.db.get_nick_value(trigger.nick, "habitica_api_user") is not None:
-            bot.db.delete_nick_group(trigger.nick)
-            bot.reply("Deleted all your settings.")
-        else:
-            bot.reply("I do not know you, sorry.")
+    if args[0] == "add":
+        start_configuration(bot, trigger)
 
-    elif trigger.group(3) == "user" and trigger.group(4) is not None:
-        if trigger.is_privmsg:
-            user_id = HabIRC.api_regex.findall(trigger.group(4))
+    elif args[0] == "del":
+        del_user(bot, trigger)
 
-            if len(user_id) > 0:
-                user_id = user_id[0]
-            else:
-                bot.msg(trigger.nick, "Invalid user ID")
-                return
+    elif args[0] == "user" and args[1] is not None:
+        add_user(args, bot, trigger)
 
-            bot.db.set_nick_value(trigger.nick, 'habitica_api_user', user_id)
+    elif args[0] == "user" and args[1] is None:
+        info_user(bot, trigger)
 
-            user = requests.get("https://habitica.com/api/v2/members/" + user_id, headers=HabIRC.auth)
-            name = user.json()["profile"]["name"]
+    elif (args[0] == "key" and args[1] != "DANGER") or \
+            (args[0] == "key" and args[1] == "DANGER" and args[2] is None):
+        info_key(bot, trigger)
 
-            bot.msg(trigger.nick, "Saved your character " + name)
-            bot.msg(trigger.nick, "If you ever want to delete your settings, use '.status del'")
-            bot.msg(trigger.nick, " ")
-            bot.msg(trigger.nick, "If you want more details or use me to cast spells or use potions, you can " +
-                    " optionally add your API Token.")
-            bot.msg(trigger.nick, "If you want this bot to save your API Token, add it with '.status key'")
+    elif args[0] == "key" and args[1] == "DANGER" and args[2] is not None:
+        add_key(args, bot, trigger)
 
-        else:
-            bot.reply("Please do not configure me in a public channel!")
-
-    elif trigger.group(3) == "user" and trigger.group(4) is None:
-        if trigger.is_privmsg:
-            bot.msg(trigger.nick, "Please give me your Habitica User ID with '.status user <User ID>'")
-        else:
-            bot.reply("Please do not configure me in a public channel!")
-
-    elif (trigger.group(3) == "key" and trigger.group(4) != "DANGER") or \
-            (trigger.group(3) == "key" and trigger.group(4) == "DANGER" and trigger.group(5) is None):
-        if trigger.is_privmsg:
-            bot.msg(trigger.nick, "Please note that the API Token can be used as a " + color("password", "red")
-                    + " and you should never give it to anyone you don't trust!")
-            bot.msg(trigger.nick, "Be aware that BAD THINGS can happen, and your API Token might be made public.")
-            bot.msg(trigger.nick, "IN NO EVENT SHALL THE OPERATORS OF THIS BOT BE LIABLE FOR ANY CLAIM, DAMAGES OR " +
-                    "OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN" +
-                    "CONNECTION WITH THE BOT OR THE USE OR OTHER DEALINGS IN THE BOT.")
-            bot.msg(trigger.nick, "" + color(bold("YOU HAVE BEEN WARNED!"), "red"))
-            bot.msg(trigger.nick, "If you ARE SURE want this bot to save your API Token, add it with " +
-                    "'.status key DANGER <API Token>'")
-
-        else:
-            bot.reply("Please do not configure me in a public channel!")
-
-    elif trigger.group(3) == "key" and trigger.group(4) == "DANGER" and trigger.group(5) is not None:
-        if trigger.is_privmsg:
-            user_key = HabIRC.api_regex.findall(trigger.group(5))
-
-            if len(user_key) > 0:
-                user_key = user_key[0]
-            else:
-                bot.reply(trigger.nick, "Invalid API Token")
-                return
-
-            bot.db.set_nick_value(trigger.nick, 'habitica_api_key', user_key)
-            bot.msg(trigger.nick, "Saved your API Token.")
-        else:
-            bot.reply("You just posted your Habitica password in a public channel. "
-                      + color(bold("Go change it RIGHT NOW!"), "red"))
-
-    elif trigger.group(3) is None:
-        api_user = bot.db.get_nick_value(trigger.nick, 'habitica_api_user')
-        api_key = bot.db.get_nick_value(trigger.nick, 'habitica_api_key')
-
-        if api_user is None:
-            bot.reply("I do not know you, sorry. Please use '.status add'.")
-            return
-
-        else:
-            if api_key is None:
-                user = requests.get("https://habitica.com/api/v2/members/" + api_user, headers=HabIRC.auth)
-            else:
-                headers = {"x-api-key": api_key, "x-api-user": api_user}
-                user = requests.get("https://habitica.com/api/v2/user", headers=headers)
-
-        if user.status_code != 200:
-            bot.say("No connection to Habitica. Please try again later.")
-
-        hp = str(round(user.json()["stats"]["hp"], 2))
-        mp = str(int(user.json()["stats"]["mp"]))
-        gp = str(round(user.json()["stats"]["gp"], 2))
-        xp = str(int(user.json()["stats"]["exp"]))
-        name = user.json()["profile"]["name"]
-
-        if api_key is not None:
-            max_hp = user.json()["stats"]["maxHealth"]
-            max_mp = user.json()["stats"]["maxMP"]
-            to_next_level = user.json()["stats"]["toNextLevel"]
-
-            hp = hp + "/" + str(max_hp)
-            mp = mp + "/" + str(max_mp)
-            xp = xp + "/" + str(to_next_level)
-
-        sep = " | "
-
-        bot.say("Status for "
-                + color(" " + name + " ", "white", "grey") + " "
-                + color(bold(u"♥ ") + hp + " HP", "red") + sep
-                + color(bold(u"⚡ ")+ mp + " MP", "blue") + sep
-                + color(bold(u"⭐ ") + xp + " XP", "yellow") + sep
-                + color(bold(u"⛁ ") + gp + " Gold", "olive")
-        )
+    elif args[0] is None:
+        show_status(bot, trigger)
 
     else:
         bot.reply("Unknown command")
 
+
+def show_status(bot, trigger):
+    api_user = bot.db.get_nick_value(trigger.nick, 'habitica_api_user')
+    api_key = bot.db.get_nick_value(trigger.nick, 'habitica_api_key')
+
+    if api_user is None:
+        bot.reply("I do not know you, sorry. Please use '.status add'.")
+        return
+
+    else:
+        if api_key is None:
+            user = requests.get("https://habitica.com/api/v2/members/" + api_user, headers=HabIRC.auth)
+        else:
+            headers = {"x-api-key": api_key, "x-api-user": api_user}
+            user = requests.get("https://habitica.com/api/v2/user", headers=headers)
+
+    if user.status_code != 200:
+        bot.say("No connection to Habitica. Please try again later.")
+        return
+
+    hp = str(round(user.json()["stats"]["hp"], 2))
+    mp = str(int(user.json()["stats"]["mp"]))
+    gp = str(round(user.json()["stats"]["gp"], 2))
+    xp = str(int(user.json()["stats"]["exp"]))
+    name = user.json()["profile"]["name"]
+    name_colors = get_name_colors(user.json())
+
+    if api_key is not None:
+        max_hp = user.json()["stats"]["maxHealth"]
+        max_mp = user.json()["stats"]["maxMP"]
+        to_next_level = user.json()["stats"]["toNextLevel"]
+
+        hp = hp + "/" + str(max_hp)
+        mp = mp + "/" + str(max_mp)
+        xp = xp + "/" + str(to_next_level)
+
+    sep = " | "
+
+    bot.say("Status for "
+            + color(" " + name + " ", name_colors[0], name_colors[1]) + " "
+            + color(bold(u"♥ ") + hp + " HP", "red") + sep
+            + color(bold(u"⚡ ") + mp + " MP", "blue") + sep
+            + color(bold(u"⭐ ") + xp + " XP", "yellow") + sep
+            + color(bold(u"⛁ ") + gp + " Gold", "olive")
+            )
+
+def get_name_colors(user):
+    colors = {
+        0: ("white", "grey"),
+        1: ("white", "pink"),
+        2: ("white", "brown"),
+        3: ("white", "red"),
+        4: ("white", "orange"),
+        5: ("black", "yellow"),
+        6: ("black", "green"),
+        7: ("black", "cyan"),
+        8: ("white", "blue"),
+        9: ("white", "purple"),
+        10: ("green", "black")
+    }
+
+    level = 0
+
+
+    if "level" in user["contributor"]:
+        level = user["contributor"]["level"]
+
+    if "npc" in user["backer"]:
+        level = 10
+
+    return colors[level]
+
+
+def add_user(args, bot, trigger):
+    if trigger.is_privmsg:
+        user_id = HabIRC.api_regex.findall(args[1])
+
+        if len(user_id) > 0:
+            user_id = user_id[0]
+        else:
+            bot.msg(trigger.nick, "Invalid user ID")
+            return
+
+        bot.db.set_nick_value(trigger.nick, 'habitica_api_user', user_id)
+
+        user = requests.get("https://habitica.com/api/v2/members/" + user_id, headers=HabIRC.auth)
+        name = user.json()["profile"]["name"]
+
+        bot.msg(trigger.nick, "Saved your character " + name)
+        bot.msg(trigger.nick, "If you ever want to delete your settings, use '.status del'")
+        bot.msg(trigger.nick, "If you want more details or use me to cast spells or use potions, you can " +
+                "optionally add your API Token.")
+        bot.msg(trigger.nick, "If you want this bot to save your API Token, add it with '.status key'")
+
+    else:
+        bot.reply("Please do not configure me in a public channel!")
+
+
+def add_key(args, bot, trigger):
+    if trigger.is_privmsg:
+        user_key = HabIRC.api_regex.findall(args[2])
+
+        if len(user_key) > 0:
+            user_key = user_key[0]
+        else:
+            bot.reply(trigger.nick, "Invalid API Token")
+            return
+
+        bot.db.set_nick_value(trigger.nick, 'habitica_api_key', user_key)
+        bot.msg(trigger.nick, "Saved your API Token.")
+    else:
+        bot.reply("You just posted your Habitica password in a public channel. "
+                  + color(bold("Go change it RIGHT NOW!"), "red"))
+
+
+def info_key(bot, trigger):
+    if trigger.is_privmsg:
+        bot.msg(trigger.nick, "Please note that the API Token can be used as a " + color("password", "red")
+                + " and you should never give it to anyone you don't trust!")
+        bot.msg(trigger.nick, "Be aware that BAD THINGS can happen, and your API Token might be made public.")
+        bot.msg(trigger.nick, "IN NO EVENT SHALL THE OPERATORS OF THIS BOT BE LIABLE FOR ANY CLAIM, DAMAGES OR " +
+                "OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN" +
+                "CONNECTION WITH THE BOT OR THE USE OR OTHER DEALINGS IN THE BOT.")
+        bot.msg(trigger.nick, "" + color(bold("YOU HAVE BEEN WARNED!"), "red"))
+        bot.msg(trigger.nick, "If you ARE SURE want this bot to save your API Token, add it with " +
+                "'.status key DANGER <API Token>'")
+
+    else:
+        bot.reply("Please do not configure me in a public channel!")
+
+
+def info_user(bot, trigger):
+    if trigger.is_privmsg:
+        bot.msg(trigger.nick, "Please give me your Habitica User ID with '.status user <User ID>'")
+    else:
+        bot.reply("Please do not configure me in a public channel!")
+
+
+def del_user(bot, trigger):
+    if bot.db.get_nick_value(trigger.nick, "habitica_api_user") is not None:
+        bot.db.delete_nick_group(trigger.nick)
+        bot.reply("Deleted all your settings.")
+    else:
+        bot.reply("I do not know you, sorry.")
+
+
+def start_configuration(bot, trigger):
+    if not trigger.is_privmsg:
+        bot.reply("Opening query for configuration.")
+    bot.msg(trigger.nick, "Please give me your Habitica User ID with '.status user <User ID>'.")
+
 @sopel.module.interval(60)
 def read_chat(bot):
-    chat = requests.get("https://habitica.com/api/v2/groups/party/chat", headers=HabIRC.auth)
+    chat = requests.get("https://habitica.com/api/v2/groups/habitrpg/chat", headers=HabIRC.auth)
 
     if chat.status_code != 200:
         return
@@ -181,8 +238,12 @@ def read_chat(bot):
                 if uuid == "system":
                     bot.msg(channel, color(chat.json()[line]["text"][1:-1], "pink"))
                 else:
-                    user = color(" " + chat.json()[line]["user"] + " ", "white", "grey")
-                    bot.msg(channel, user + " " + chat.json()[line]["text"])
+                    user = requests.get("https://habitica.com/api/v2/members/" + uuid, headers=HabIRC.auth)
+
+                    name =  " " + user.json()["profile"]["name"] + " "
+                    colors = get_name_colors(user.json())
+                    message = chat.json()[line]["text"]
+                    bot.msg(channel, color(name, colors[0], colors[1]) + " " + message)
 
             HabIRC.last_timestamp[channel] = int(chat.json()[0]["timestamp"])
             bot.db.set_channel_value(channel, "last_timestamp", HabIRC.last_timestamp[channel])
