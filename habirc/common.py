@@ -10,6 +10,7 @@ from sopel.config.types import StaticSection, ValidatedAttribute, ListAttribute
 class HabircSection(StaticSection):
     api_user = ValidatedAttribute('api_user')
     api_key = ValidatedAttribute('api_key')
+    max_messages = ValidatedAttribute('max_messages', int, default=3)
     channels = ListAttribute('channels')
 
 

@@ -35,7 +35,8 @@ def read_chat(bot):
                     name = " " + user.json()["profile"]["name"] + " "
                     colors = get_name_colors(user.json())
                     message = chat.json()[line]["text"]
-                    bot.msg(channel, color(name, colors[0], colors[1]) + " " + message)
+                    bot.msg(channel, color(name, colors[0], colors[1]) + " " + message,
+                            max_messages=bot.config.habirc.max_messages)
 
             Common.last_timestamp[channel] = int(chat.json()[0]["timestamp"])
             bot.db.set_channel_value(channel, "last_timestamp", Common.last_timestamp[channel])
