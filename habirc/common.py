@@ -10,8 +10,9 @@ from sopel.config.types import StaticSection, ValidatedAttribute, ListAttribute
 class HabircSection(StaticSection):
     api_user = ValidatedAttribute('api_user')
     api_key = ValidatedAttribute('api_key')
-    max_messages = ValidatedAttribute('max_messages', int, default=3)
+    max_messages = ValidatedAttribute('max_messages', int, default=5)
     channels = ListAttribute('channels')
+    chats = ListAttribute('chats')
 
 
 class Common:
@@ -19,6 +20,7 @@ class Common:
 
     auth = {}
     last_timestamp = {}
+    chats = {}
     uuid_regex = re.compile(ur'[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}')
 
 
@@ -56,6 +58,11 @@ def set_up(bot):
     bot.config.define_section('habirc', HabircSection)
 
     Common.auth = {"x-api-key": bot.config.habirc.api_key, "x-api-user": bot.config.habirc.api_user}
+
+    if len(bot.config.habirc.channels) != len(bot.config.habirc.chats):
+        raise ValueError("Length of configured channels and chats do not match.")
+
+    Common.chats = dict(zip(bot.config.habirc.channels, bot.config.habirc.chats))
 
     for channel in bot.config.habirc.channels:
         timestamp = bot.db.get_channel_value(channel, "last_timestamp")
