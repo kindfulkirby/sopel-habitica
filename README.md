@@ -17,6 +17,7 @@ Planned Features:
 * Cast spells from IRC
 * Use Health potion from IRC
 * Autoheal
+* Talk in chat from IRC
 
 Maybe Features:
 
