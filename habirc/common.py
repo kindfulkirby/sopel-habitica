@@ -15,8 +15,9 @@ class HabircSection(StaticSection):
     chats = ListAttribute('chats')
 
 
+# noinspection PyClassHasNoInit
 class Common:
-    """ Provides static variables and methods common to several submodules,"""
+    """ Provides static variables common to several submodules,"""
 
     auth = {}
     last_timestamp = {}

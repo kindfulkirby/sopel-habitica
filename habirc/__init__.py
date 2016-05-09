@@ -6,16 +6,16 @@ import sopel.module
 
 from .common import Common, set_up
 from .chat import read_chat
-from .status import show_status
+from .hero import hero_command
 
 
 def setup(bot):
     set_up(bot)
 
 
-@sopel.module.commands('status')
-def status(bot, trigger):
-    show_status(bot, trigger)
+@sopel.module.commands('hero')
+def hero(bot, trigger):
+    hero_command(bot, trigger)
 
 
 @sopel.module.interval(60)
