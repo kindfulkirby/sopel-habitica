@@ -100,9 +100,7 @@ def say_chat(bot, trigger):
         if response.status_code != 200:
             bot.say("No connection to Habitica. Please try again later.")
 
-        message = response.json()["message"]
-
-        post_message(bot, channel, message)
+        read_chat(bot)
 
     else:
         bot.reply("Please use me in a channel that has a Habitica chat associated with it.")
