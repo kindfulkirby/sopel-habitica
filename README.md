@@ -9,7 +9,8 @@ The chosen unicode icons look best with [good emoji support][3].
 Working so far:
 
 * Echoes Habitica party chat into IRC
-* .status command displays character status
+* Talk in chat from IRC
+* .hero command displays character status
 * Shows nick colors
 
 Planned Features:
@@ -17,7 +18,8 @@ Planned Features:
 * Cast spells from IRC
 * Use Health potion from IRC
 * Autoheal
-* Talk in chat from IRC
+* Make colors toggleable
+* Some markdown parsing (code blocks!)
 
 Maybe Features:
 
