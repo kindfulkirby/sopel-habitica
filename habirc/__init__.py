@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import sopel.module
 
 from .common import Common, set_up
-from .chat import read_chat
+from .chat import read_chat, say_chat
 from .hero import hero_command
 
 
@@ -16,6 +16,11 @@ def setup(bot):
 @sopel.module.commands('hero')
 def hero(bot, trigger):
     hero_command(bot, trigger)
+
+
+@sopel.module.commands('say')
+def say(bot, trigger):
+    say_chat(bot, trigger)
 
 
 @sopel.module.interval(60)

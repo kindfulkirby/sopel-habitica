@@ -13,6 +13,7 @@ class HabircSection(StaticSection):
     max_messages = ValidatedAttribute('max_messages', int, default=5)
     channels = ListAttribute('channels')
     chats = ListAttribute('chats')
+    chat_lines = ListAttribute('chat_lines', int, default=30)
 
 
 # noinspection PyClassHasNoInit

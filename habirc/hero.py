@@ -34,8 +34,8 @@ def user_configure(argument, bot, trigger):
 
         bot.msg(trigger.nick, "Saved your character " + name)
         bot.msg(trigger.nick, "If you ever want to delete your settings, use '.hero del'")
-        bot.msg(trigger.nick, "If you want more details or use me to cast spells or use potions, you can " +
-                "optionally add your API Token.")
+        bot.msg(trigger.nick, "If you want more details or use me to cast spells, use potions or talk in the chat, " +
+                "you can optionally add your API Token.")
         bot.msg(trigger.nick, "If you want this bot to save your API Token, add it with '.hero key'")
 
     else:
@@ -59,7 +59,7 @@ def user_del(bot, trigger):
 def key_add(bot, trigger):
     arguments = [trigger.group(4), trigger.group(5)]
 
-    if arguments[0] == "DANGER" and arguments[1] is not None:
+    if arguments[0] == "IHAVEBEENWARNED" and arguments[1] is not None:
         key_configure(arguments[1], bot, trigger)
     else:
         key_info(bot, trigger)
@@ -84,19 +84,18 @@ def key_configure(argument, bot, trigger):
 
 
 def key_info(bot, trigger):
-    if trigger.is_privmsg:
-        bot.msg(trigger.nick, "Please note that the API Token can be used as a " + color("password", "red")
-                + " and you should never give it to anyone you don't trust!")
-        bot.msg(trigger.nick, "Be aware that BAD THINGS can happen, and your API Token might be made public.")
-        bot.msg(trigger.nick, "IN NO EVENT SHALL THE OPERATORS OF THIS BOT BE LIABLE FOR ANY CLAIM, DAMAGES OR " +
-                "OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN" +
-                "CONNECTION WITH THE BOT OR THE USE OR OTHER DEALINGS IN THE BOT.")
-        bot.msg(trigger.nick, "" + color(bold("YOU HAVE BEEN WARNED!"), "red"))
-        bot.msg(trigger.nick, "If you ARE SURE want this bot to save your API Token, add it with " +
-                "'.hero key DANGER <API Token>'")
+    if not trigger.is_privmsg:
+        bot.reply("Opening query for configuration.")
 
-    else:
-        bot.reply("Please do not configure me in a public channel!")
+    bot.msg(trigger.nick, "Please note that the API Token can be used as a " + color("password", "red")
+            + " and you should never give it to anyone you don't trust!")
+    bot.msg(trigger.nick, "Be aware that BAD THINGS can happen, and your API Token might be made public.")
+    bot.msg(trigger.nick, "IN NO EVENT SHALL THE OPERATORS OF THIS BOT BE LIABLE FOR ANY CLAIM, DAMAGES OR " +
+            "OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN" +
+            "CONNECTION WITH THE BOT OR THE USE OR OTHER DEALINGS IN THE BOT.")
+    bot.msg(trigger.nick, "" + color(bold("YOU HAVE BEEN WARNED!"), "red"))
+    bot.msg(trigger.nick, "If you ARE SURE want this bot to save your API Token, add it with " +
+            "'.hero key IHAVEBEENWARNED <API Token>'")
 
 
 def show_status(bot, trigger):
