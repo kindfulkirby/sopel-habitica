@@ -18,6 +18,11 @@ Planned Features:
 * Make colors toggleable
 * Some markdown parsing (code blocks!)
 
+TODO:
+
+* Tests
+* Documentation
+
 Maybe Features:
 
 * Add Habits/Dailies/Todos
