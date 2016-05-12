@@ -51,20 +51,18 @@ def read_chat(bot):
         if lines.status_code != 200:
             continue
 
-        for line in xrange(len(lines.json()) - 1, -1, -1):
+        for line in lines.json()[::-1]:
 
-            timestamp = int(lines.json()[line]["timestamp"])
+            timestamp = int(line["timestamp"])
 
             if timestamp <= bot.memory["last_timestamp"][channel]:
                 continue
 
-            message = lines.json()[line]
-
             # weird messages sometimes show up, containing only "."; we ignore these.
-            if message["text"] == ".":
+            if line["text"] == ".":
                 continue
 
-            send_message(bot, channel, message)
+            send_message(bot, channel, line)
 
         bot.memory["last_timestamp"][channel] = int(lines.json()[0]["timestamp"])
         bot.db.set_channel_value(channel, "last_timestamp", bot.memory["last_timestamp"][channel])
