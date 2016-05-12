@@ -11,19 +11,20 @@ from .common import Common, get_name_colors
 def send_message(bot, channel, message):
     uuid = message["uuid"]
 
+    # TODO: Needs actual markdown parsing!
     if uuid == "system":
-        bot.msg(channel, color(message["text"][1:-1], "pink"))
+        bot.msg(channel, color(message["text"][1:-1], Common.action_color))
 
     else:
         user = requests.get("https://habitica.com/api/v2/members/" + uuid, headers=Common.auth)
 
         if user.status_code == 200:
-            name = " " + user.json()["profile"]["name"] + " "
+            name = Common.name_prefix + user.json()["profile"]["name"] + Common.name_suffix
             colors = get_name_colors(user.json())
 
         else:
-            name = " " + message["user"] + " "
-            colors = ("white", "grey")
+            name = Common.name_prefix + message["user"] + Common.name_suffix
+            colors = Common.default_colors
 
         text = message["text"]
 

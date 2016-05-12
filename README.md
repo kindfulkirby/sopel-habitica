@@ -9,13 +9,13 @@ Working so far:
 * Talk in chat from IRC
 * .hero command displays character status
 * Shows nick colors
+* Disable colors (not recommended)
 
 Planned Features:
 
 * Cast spells from IRC
 * Use Health potion from IRC
 * Autoheal
-* Make colors toggleable
 * Some markdown parsing (code blocks!)
 
 TODO:

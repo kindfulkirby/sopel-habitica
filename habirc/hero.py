@@ -133,14 +133,14 @@ def show_status(bot, trigger):
         mp = mp + "/" + str(max_mp)
         xp = xp + "/" + str(to_next_level)
 
-    sep = " | "
+    seperator = " | "
 
     bot.say("Status for "
-            + color(" " + name + " ", name_colors[0], name_colors[1]) + " "
-            + color(bold(u"♥ ") + hp + " HP", "red") + sep
-            + color(bold(u"⚡ ") + mp + " MP", "blue") + sep
-            + color(bold(u"⭐ ") + xp + " XP", "yellow") + sep
-            + color(bold(u"⛁ ") + gp + " Gold", "olive")
+            + color(Common.name_prefix + name + Common.name_suffix, name_colors[0], name_colors[1]) + " "
+            + color(bold(u"♥ ") + hp + " HP", Common.hp_color) + seperator
+            + color(bold(u"⚡ ") + mp + " MP", Common.mp_color) + seperator
+            + color(bold(u"⭐ ") + xp + " XP", Common.xp_color) + seperator
+            + color(bold(u"⛁ ") + gp + " Gold", Common.gp_color)
             )
 
 

@@ -13,6 +13,7 @@ class HabircSection(StaticSection):
     max_messages = ValidatedAttribute('max_messages', int, default=5)
     channels = ListAttribute('channels')
     chats = ListAttribute('chats')
+    colors = ValidatedAttribute('colors', bool, default=True)
 
 # noinspection PyClassHasNoInit
 class Common:
@@ -21,14 +22,15 @@ class Common:
     auth = {}
     chats = {}
     uuid_regex = re.compile(ur'[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}')
-
-
-def get_name_colors(user):
-    """
-    :param user: The dict of a Habitica user, as returned from the API
-    :return: A tuple of the fore- and background color belonging to the user's class
-    """
-    colors = {
+    name_prefix = " "
+    name_suffix = " "
+    default_colors = ("white", "grey")
+    hp_color = "red"
+    mp_color = "blue"
+    xp_color = "yellow"
+    gp_color = "olive"
+    action_color = "pink"
+    user_colors = {
         0: ("white", "grey"),
         1: ("white", "pink"),
         2: ("white", "brown"),
@@ -42,6 +44,13 @@ def get_name_colors(user):
         10: ("green", "black")
     }
 
+
+def get_name_colors(user):
+    """
+    :param user: The dict of a Habitica user, as returned from the API
+    :return: A tuple of the fore- and background color belonging to the user's class
+    """
+
     level = 0
 
     if "level" in user["contributor"]:
@@ -50,7 +59,7 @@ def get_name_colors(user):
     if "npc" in user["backer"]:
         level = 10
 
-    return colors[level]
+    return Common.user_colors[level]
 
 
 def set_up(bot):
@@ -62,6 +71,29 @@ def set_up(bot):
         raise ValueError("Length of configured channels and chats do not match.")
 
     Common.chats = dict(zip(bot.config.habirc.channels, bot.config.habirc.chats))
+
+    if not bot.config.habirc.colors:
+        Common.name_prefix = "["
+        Common.name_suffix = "]"
+        Common.default_colors = (None, None)
+        Common.hp_color = None
+        Common.mp_color = None
+        Common.xp_color = None
+        Common.gp_color = None
+        Common.action_color = None
+        Common.user_colors = {
+            0: (None, None),
+            1: (None, None),
+            2: (None, None),
+            3: (None, None),
+            4: (None, None),
+            5: (None, None),
+            6: (None, None),
+            7: (None, None),
+            8: (None, None),
+            9: (None, None),
+            10: (None, None),
+        }
 
     bot.memory["last_timestamp"] = dict()
 
