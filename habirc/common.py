@@ -13,15 +13,12 @@ class HabircSection(StaticSection):
     max_messages = ValidatedAttribute('max_messages', int, default=5)
     channels = ListAttribute('channels')
     chats = ListAttribute('chats')
-    chat_lines = ListAttribute('chat_lines', int, default=30)
-
 
 # noinspection PyClassHasNoInit
 class Common:
     """ Provides static variables common to several submodules,"""
 
     auth = {}
-    last_timestamp = {}
     chats = {}
     uuid_regex = re.compile(ur'[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}')
 
@@ -66,9 +63,11 @@ def set_up(bot):
 
     Common.chats = dict(zip(bot.config.habirc.channels, bot.config.habirc.chats))
 
+    bot.memory["last_timestamp"] = dict()
+
     for channel in bot.config.habirc.channels:
         timestamp = bot.db.get_channel_value(channel, "last_timestamp")
         if timestamp is None:
-            Common.last_timestamp[channel] = 0
+            bot.memory["last_timestamp"][channel] = 0
         else:
-            Common.last_timestamp[channel] = int(timestamp)
+            bot.memory["last_timestamp"][channel] = int(timestamp)

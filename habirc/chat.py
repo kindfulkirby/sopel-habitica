@@ -8,7 +8,7 @@ from sopel.formatting import color
 from .common import Common, get_name_colors
 
 
-def post_message(bot, channel, message):
+def send_message(bot, channel, message):
     uuid = message["uuid"]
 
     if uuid == "system":
@@ -50,19 +50,23 @@ def read_chat(bot):
         if lines.status_code != 200:
             continue
 
-        for line in xrange(bot.config.habirc.chat_lines, -1, -1):
+        for line in xrange(len(lines.json()) - 1, -1, -1):
 
             timestamp = int(lines.json()[line]["timestamp"])
 
-            if timestamp <= Common.last_timestamp[channel]:
+            if timestamp <= bot.memory["last_timestamp"][channel]:
                 continue
 
             message = lines.json()[line]
 
-            post_message(bot, channel, message)
+            # weird messages sometimes show up, containing only "."; we ignore these.
+            if message["text"] == ".":
+                continue
 
-        Common.last_timestamp[channel] = int(lines.json()[0]["timestamp"])
-        bot.db.set_channel_value(channel, "last_timestamp", Common.last_timestamp[channel])
+            send_message(bot, channel, message)
+
+        bot.memory["last_timestamp"][channel] = int(lines.json()[0]["timestamp"])
+        bot.db.set_channel_value(channel, "last_timestamp", bot.memory["last_timestamp"][channel])
 
 
 def say_chat(bot, trigger):
