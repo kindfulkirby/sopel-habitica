@@ -55,7 +55,7 @@ colors = True
 api_url = https://habitica.com/api/v2/
 ```
 
-`max_lines` is the number of lines each IRC message (which itself is limited to 400 characters) can be long.  
+`max_lines` is the number of lines (each of which is limited to 400 characters) each IRC message can be long.  
 `colors` can be set to `False` to deactivate the colors for this module. Makes it much harder to read, though!
 `api_url` is the url of the Habitica API. If you have your own version of Habitica running, you might want to change it.
 
