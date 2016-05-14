@@ -10,10 +10,11 @@ from sopel.config.types import StaticSection, ValidatedAttribute, ListAttribute
 class HabircSection(StaticSection):
     api_user = ValidatedAttribute('api_user')
     api_key = ValidatedAttribute('api_key')
-    max_messages = ValidatedAttribute('max_messages', int, default=5)
+    max_lines = ValidatedAttribute('max_lines', int, default=5)
     channels = ListAttribute('channels')
     chats = ListAttribute('chats')
     colors = ValidatedAttribute('colors', bool, default=True)
+    api_url = ValidatedAttribute('api_url', default="https://habitica.com/api/v2/")
 
 # noinspection PyClassHasNoInit
 class Common:

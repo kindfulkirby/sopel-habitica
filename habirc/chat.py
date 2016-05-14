@@ -16,7 +16,7 @@ def send_message(bot, channel, message):
         bot.msg(channel, color(message["text"][1:-1], Common.action_color))
 
     else:
-        user = requests.get("https://habitica.com/api/v2/members/" + uuid, headers=Common.auth)
+        user = requests.get(bot.config.habirc.api_url + "members/" + uuid, headers=Common.auth)
 
         if user.status_code == 200:
             name = Common.name_prefix + user.json()["profile"]["name"] + Common.name_suffix
@@ -31,7 +31,7 @@ def send_message(bot, channel, message):
         bot.msg(
             channel,
             color(name, colors[0], colors[1]) + " " + text,
-            max_messages=bot.config.habirc.max_messages
+            max_messages=bot.config.habirc.max_lines
         )
 
 
@@ -46,7 +46,7 @@ def read_chat(bot):
         if chat.upper() == "NONE":
             continue
 
-        lines = requests.get("https://habitica.com/api/v2/groups/" + chat + "/chat", headers=Common.auth)
+        lines = requests.get(bot.config.habirc.api_url + "groups/" + chat + "/chat", headers=Common.auth)
 
         if lines.status_code != 200:
             continue
@@ -95,7 +95,7 @@ def say_chat(bot, trigger):
         payload = {"message": trigger.group(2)}
 
         response = requests.post(
-            "https://habitica.com/api/v2/groups/" + chat + "/chat",
+            bot.config.habirc.api_url + "groups/" + chat + "/chat",
             headers=headers,
             params=payload
         )
