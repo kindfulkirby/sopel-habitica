@@ -58,13 +58,14 @@ def read_chat(bot):
             if timestamp <= bot.memory["last_timestamp"][channel]:
                 continue
 
+            bot.memory["last_timestamp"][channel] = timestamp
+
             # weird messages sometimes show up, containing only "."; we ignore these.
             if line["text"] == ".":
                 continue
 
             send_message(bot, channel, line)
 
-        bot.memory["last_timestamp"][channel] = int(lines.json()[0]["timestamp"])
         bot.db.set_channel_value(channel, "last_timestamp", bot.memory["last_timestamp"][channel])
 
 
