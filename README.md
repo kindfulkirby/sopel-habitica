@@ -42,7 +42,7 @@ chats = <comma separated list of Habitca chat IDs (see below)>
 ```
 
 Those are the *mandatory* configuration lines.  
-`chats=` can contain either the UUIDs of a chat, or `party` for your current party's chat or `habitrpg` for the Tavern
+`chats=` can contain either the UUID of a chat, or `party` for your current party's chat or `habitrpg` for the Tavern
 chat.
 
 ### Optional configuration  
