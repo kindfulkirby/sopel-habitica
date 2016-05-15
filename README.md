@@ -12,13 +12,13 @@ Working so far:
 * .hero command displays character status
 * Shows nick colors
 * Disable colors (not recommended)
+* Renders markdown code blocks in colors (if enabled)
 
 Planned Features:
 
 * Cast spells from IRC
 * Use Health potion from IRC
 * Autoheal
-* Some markdown parsing (code blocks!)
 
 Maybe Features:
 
