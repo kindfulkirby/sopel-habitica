@@ -58,6 +58,11 @@ def send_message(bot, channel, message):
 
 
 def read_chat(bot):
+    if bot.memory["habirc_read_chat_running"]:
+        return
+
+    bot.memory["habirc_read_chat_running"] = True
+
     for channel in bot.config.habirc.channels:
 
         if channel not in bot.channels:
@@ -77,10 +82,10 @@ def read_chat(bot):
 
             timestamp = int(line["timestamp"])
 
-            if timestamp <= bot.memory["last_timestamp"][channel]:
+            if timestamp <= bot.memory["habirc_last_timestamp"][channel]:
                 continue
 
-            bot.memory["last_timestamp"][channel] = timestamp
+            bot.memory["habirc_last_timestamp"][channel] = timestamp
 
             # weird messages sometimes show up, containing only "."; we ignore these.
             if line["text"] == ".":
@@ -88,7 +93,9 @@ def read_chat(bot):
 
             send_message(bot, channel, line)
 
-        bot.db.set_channel_value(channel, "last_timestamp", bot.memory["last_timestamp"][channel])
+        bot.db.set_channel_value(channel, "habirc_last_timestamp", bot.memory["habirc_last_timestamp"][channel])
+
+    bot.memory["habirc_read_chat_running"] = False
 
 
 def say_chat(bot, trigger):

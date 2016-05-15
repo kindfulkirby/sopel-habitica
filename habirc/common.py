@@ -97,11 +97,11 @@ def set_up(bot):
             10: (None, None),
         }
 
-    bot.memory["last_timestamp"] = dict()
+    bot.memory["habirc_last_timestamp"] = dict()
 
     for channel in bot.config.habirc.channels:
-        timestamp = bot.db.get_channel_value(channel, "last_timestamp")
+        timestamp = bot.db.get_channel_value(channel, "habirc_last_timestamp")
         if timestamp is None:
-            bot.memory["last_timestamp"][channel] = 0
+            bot.memory["habirc_last_timestamp"][channel] = 0
         else:
-            bot.memory["last_timestamp"][channel] = int(timestamp)
+            bot.memory["habirc_last_timestamp"][channel] = int(timestamp)
