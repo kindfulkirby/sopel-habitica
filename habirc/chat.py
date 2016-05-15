@@ -4,16 +4,34 @@ from __future__ import absolute_import
 
 import requests
 from sopel.formatting import color
+from time import sleep
 
 from .common import Common, get_name_colors
+
+
+def parse_code_tags(bot, text):
+    if not bot.config.habirc.colors:
+        return text
+
+    result = ""
+
+    segments = Common.code_tag_regex.split(text)
+
+    for segment in segments:
+        if segment[0] == "`" and segment[-1] == "`":
+            result += color(segment[1:-1], Common.action_color)
+        else:
+            result += segment
+
+    return result
 
 
 def send_message(bot, channel, message):
     uuid = message["uuid"]
 
-    # TODO: Needs actual markdown parsing!
     if uuid == "system":
-        bot.msg(channel, color(message["text"][1:-1], Common.action_color))
+        name = "*"
+        colors = (Common.action_color, None)
 
     else:
         user = requests.get(bot.config.habirc.api_url + "members/" + uuid, headers=Common.auth)
@@ -26,13 +44,17 @@ def send_message(bot, channel, message):
             name = Common.name_prefix + message["user"] + Common.name_suffix
             colors = Common.default_colors
 
-        text = message["text"]
+    text = parse_code_tags(bot, message["text"])
 
-        bot.msg(
-            channel,
-            color(name, colors[0], colors[1]) + " " + text,
-            max_messages=bot.config.habirc.max_lines
-        )
+    bot.msg(
+        channel,
+        color(name, colors[0], colors[1]) + " " + text,
+        max_messages=bot.config.habirc.max_lines
+    )
+
+    # manual rate limiting, otherwise multi-line messages might be broken up due to bot's scheduling
+    length = (len(text) / 400.0) + .2
+    sleep(length)
 
 
 def read_chat(bot):
@@ -51,7 +73,7 @@ def read_chat(bot):
         if lines.status_code != 200:
             continue
 
-        for line in lines.json()[::-1]:
+        for line in reversed(lines.json()):
 
             timestamp = int(line["timestamp"])
 

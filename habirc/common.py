@@ -23,6 +23,7 @@ class Common:
     auth = {}
     chats = {}
     uuid_regex = re.compile(ur'[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}')
+    code_tag_regex = re.compile(ur'(`[^`]+`)')
     name_prefix = " "
     name_suffix = " "
     default_colors = ("white", "grey")
