@@ -2,9 +2,10 @@
 
 from __future__ import absolute_import
 
+from time import sleep
+
 import requests
 from sopel.formatting import color
-from time import sleep
 
 from .common import Common, get_name_colors
 

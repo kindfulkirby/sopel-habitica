@@ -4,7 +4,7 @@ from __future__ import absolute_import
 
 import sopel.module
 
-from .common import Common, set_up
+from .common import set_up
 from .chat import read_chat, say_chat
 from .hero import hero_command
 
