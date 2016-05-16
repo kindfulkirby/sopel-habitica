@@ -13,16 +13,19 @@ def setup(bot):
     set_up(bot)
 
 
+@sopel.module.rate(60)
 @sopel.module.commands('hero')
 def hero(bot, trigger):
     hero_command(bot, trigger)
 
 
+@sopel.module.thread(False)
 @sopel.module.commands('say')
 def say(bot, trigger):
     say_chat(bot, trigger)
 
 
+@sopel.module.priority("low")
 @sopel.module.interval(60)
 def chat(bot):
     read_chat(bot)
