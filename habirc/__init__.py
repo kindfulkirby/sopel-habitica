@@ -19,7 +19,6 @@ def hero(bot, trigger):
     hero_command(bot, trigger)
 
 
-@sopel.module.thread(False)
 @sopel.module.commands('say')
 def say(bot, trigger):
     say_chat(bot, trigger)

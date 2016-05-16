@@ -58,6 +58,11 @@ def send_message(bot, channel, message):
 
 
 def read_chat(bot):
+    if bot.memory["habirc_read_chat_lock"]:
+        return
+
+    bot.memory["habirc_read_chat_lock"] = True
+
     for channel in bot.config.habirc.channels:
 
         if channel not in bot.channels:
@@ -89,6 +94,8 @@ def read_chat(bot):
             send_message(bot, channel, line)
 
         bot.db.set_channel_value(channel, "habirc_last_timestamp", bot.memory["habirc_last_timestamp"][channel])
+
+    bot.memory["habirc_read_chat_lock"] = False
 
 
 def say_chat(bot, trigger):
