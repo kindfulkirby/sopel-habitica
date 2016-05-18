@@ -29,7 +29,7 @@ def user_configure(argument, bot, trigger):
 
         bot.db.set_nick_value(trigger.nick, 'habitica_api_user', user_id)
 
-        user = requests.get(bot.config.habirc.api_url + "members/" + user_id, headers=Common.auth)
+        user = requests.get(bot.config.habitica.api_url + "members/" + user_id, headers=Common.auth)
         name = user.json()["profile"]["name"]
 
         bot.msg(trigger.nick, "Saved your character " + name)
@@ -108,10 +108,10 @@ def show_status(bot, trigger):
 
     else:
         if api_key is None:
-            user = requests.get(bot.config.habirc.api_url + "members/" + api_user, headers=Common.auth)
+            user = requests.get(bot.config.habitica.api_url + "members/" + api_user, headers=Common.auth)
         else:
             headers = {"x-api-key": api_key, "x-api-user": api_user}
-            user = requests.get(bot.config.habirc.api_url + "user", headers=headers)
+            user = requests.get(bot.config.habitica.api_url + "user", headers=headers)
 
     if user.status_code != 200:
         bot.say("No connection to Habitica. Please try again later.")

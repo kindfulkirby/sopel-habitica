@@ -1,4 +1,4 @@
-# habirc
+# Sopel Habitica Module
 [Sopel][1] IRC bot module for [Habitica][2]
 
 The chosen unicode icons look best with [good emoji support][3].
@@ -25,16 +25,21 @@ Maybe Features:
 * Add Habits/Dailies/Todos
 * Up/Down/Complete Habits/Dailies/Todos/Checklists
 
+## Installation
+
+Clone this repository, open a terminal in the directory you cloned it to and run `pip install .`.  
+Soon to be found in pypi, too!
+
 ## Configuration
 
 Edit your Sopel config file (normally `.sopel/default.cfg`).
 
-Under `[core]` add `habirc` to `enable=` to enable the module.
+Under `[core]` add `habitica` to `enable=` to enable the module.
 
 Then put in this section
 
 ```
-[habirc]  
+[habitica]  
 api_user = <a Habitica User ID>
 api_key = <the corresponding API Token>
 channels = <comma separated list of IRC channels you want a Habitica chat in>
@@ -47,7 +52,7 @@ chat.
 
 ### Optional configuration  
 
-The following lines optionally go in the `[habirc]` section, the values behind them are the default values:
+The following lines optionally go in the `[habitica]` section, the values behind them are the default values:
 
 ``` 
 max_lines = 5

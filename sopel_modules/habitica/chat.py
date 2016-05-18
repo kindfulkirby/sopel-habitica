@@ -11,12 +11,15 @@ from .common import Common, get_name_colors
 
 
 def parse_code_tags(bot, text):
-    if not bot.config.habirc.colors:
+    if not bot.config.habitica.colors:
         return text
 
     result = ""
 
     segments = Common.code_tag_regex.split(text)
+
+    #filter out zero-length segments
+    segments = filter(None, segments)
 
     for segment in segments:
         if segment[0] == "`" and segment[-1] == "`":
@@ -35,7 +38,7 @@ def send_message(bot, channel, message):
         colors = (Common.action_color, None)
 
     else:
-        user = requests.get(bot.config.habirc.api_url + "members/" + uuid, headers=Common.auth)
+        user = requests.get(bot.config.habitica.api_url + "members/" + uuid, headers=Common.auth)
 
         if user.status_code == 200:
             name = Common.name_prefix + user.json()["profile"]["name"] + Common.name_suffix
@@ -50,21 +53,20 @@ def send_message(bot, channel, message):
     bot.msg(
         channel,
         color(name, colors[0], colors[1]) + " " + text,
-        max_messages=bot.config.habirc.max_lines
+        max_messages=bot.config.habitica.max_lines
     )
 
     # manual rate limiting, otherwise multi-line messages might be broken up due to bot's scheduling
-    length = (len(text) / 400.0) + .2
-    sleep(length)
+    sleep(len(text) / 400.0)
 
 
 def read_chat(bot):
-    if bot.memory["habirc_read_chat_lock"]:
+    if bot.memory["habitica_read_chat_lock"]:
         return
 
-    bot.memory["habirc_read_chat_lock"] = True
+    bot.memory["habitica_read_chat_lock"] = True
 
-    for channel in bot.config.habirc.channels:
+    for channel in bot.config.habitica.channels:
 
         if channel not in bot.channels:
             continue
@@ -74,7 +76,7 @@ def read_chat(bot):
         if chat.upper() == "NONE":
             continue
 
-        lines = requests.get(bot.config.habirc.api_url + "groups/" + chat + "/chat", headers=Common.auth)
+        lines = requests.get(bot.config.habitica.api_url + "groups/" + chat + "/chat", headers=Common.auth)
 
         if lines.status_code != 200:
             continue
@@ -83,10 +85,10 @@ def read_chat(bot):
 
             timestamp = int(line["timestamp"])
 
-            if timestamp <= bot.memory["habirc_last_timestamp"][channel]:
+            if timestamp <= bot.memory["habitica_last_timestamp"][channel]:
                 continue
 
-            bot.memory["habirc_last_timestamp"][channel] = timestamp
+            bot.memory["habitica_last_timestamp"][channel] = timestamp
 
             # weird messages sometimes show up, containing only "."; we ignore these.
             if line["text"] == ".":
@@ -94,9 +96,9 @@ def read_chat(bot):
 
             send_message(bot, channel, line)
 
-        bot.db.set_channel_value(channel, "habirc_last_timestamp", bot.memory["habirc_last_timestamp"][channel])
+        bot.db.set_channel_value(channel, "habitica_last_timestamp", bot.memory["habitica_last_timestamp"][channel])
 
-    bot.memory["habirc_read_chat_lock"] = False
+    bot.memory["habitica_read_chat_lock"] = False
 
 
 def say_chat(bot, trigger):
@@ -126,7 +128,7 @@ def say_chat(bot, trigger):
         payload = {"message": trigger.group(2)}
 
         response = requests.post(
-            bot.config.habirc.api_url + "groups/" + chat + "/chat",
+            bot.config.habitica.api_url + "groups/" + chat + "/chat",
             headers=headers,
             params=payload
         )

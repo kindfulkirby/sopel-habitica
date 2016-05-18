@@ -7,7 +7,7 @@ import re
 from sopel.config.types import StaticSection, ValidatedAttribute, ListAttribute
 
 
-class HabircSection(StaticSection):
+class HabiticaSection(StaticSection):
     api_user = ValidatedAttribute('api_user')
     api_key = ValidatedAttribute('api_key')
     max_lines = ValidatedAttribute('max_lines', int, default=5)
@@ -65,16 +65,16 @@ def get_name_colors(user):
 
 
 def set_up(bot):
-    bot.config.define_section('habirc', HabircSection)
+    bot.config.define_section('habitica', HabiticaSection)
 
-    Common.auth = {"x-api-key": bot.config.habirc.api_key, "x-api-user": bot.config.habirc.api_user}
+    Common.auth = {"x-api-key": bot.config.habitica.api_key, "x-api-user": bot.config.habitica.api_user}
 
-    if len(bot.config.habirc.channels) != len(bot.config.habirc.chats):
+    if len(bot.config.habitica.channels) != len(bot.config.habitica.chats):
         raise ValueError("Length of configured channels and chats do not match.")
 
-    Common.chats = dict(zip(bot.config.habirc.channels, bot.config.habirc.chats))
+    Common.chats = dict(zip(bot.config.habitica.channels, bot.config.habitica.chats))
 
-    if not bot.config.habirc.colors:
+    if not bot.config.habitica.colors:
         Common.name_prefix = "["
         Common.name_suffix = "]"
         Common.default_colors = (None, None)
@@ -97,11 +97,12 @@ def set_up(bot):
             10: (None, None),
         }
 
-    bot.memory["habirc_last_timestamp"] = dict()
+    bot.memory["habitica_last_timestamp"] = dict()
+    bot.memory["habitica_read_chat_lock"] = False
 
-    for channel in bot.config.habirc.channels:
-        timestamp = bot.db.get_channel_value(channel, "habirc_last_timestamp")
+    for channel in bot.config.habitica.channels:
+        timestamp = bot.db.get_channel_value(channel, "habitica_last_timestamp")
         if timestamp is None:
-            bot.memory["habirc_last_timestamp"][channel] = 0
+            bot.memory["habitica_last_timestamp"][channel] = 0
         else:
-            bot.memory["habirc_last_timestamp"][channel] = int(timestamp)
+            bot.memory["habitica_last_timestamp"][channel] = int(timestamp)
