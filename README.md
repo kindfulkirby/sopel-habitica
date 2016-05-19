@@ -27,7 +27,8 @@ Maybe Features:
 
 ## Installation
 
-Clone this repository, open a terminal in the directory you cloned it to and run `pip install .`.  
+Run `pip install git+https://github.com/ttheuer/sopel-habitica.git#egg=sopel_modules.habitica`
+
 Soon to be found in pypi, too!
 
 ## Configuration
