@@ -20,11 +20,6 @@ Planned Features:
 * Use Health potion from IRC
 * Autoheal
 
-Maybe Features:
-
-* Add Habits/Dailies/Todos
-* Up/Down/Complete Habits/Dailies/Todos/Checklists
-
 ## Installation
 
 Run `pip install git+https://github.com/ttheuer/sopel-habitica.git#egg=sopel_modules.habitica`
