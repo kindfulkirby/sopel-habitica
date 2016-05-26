@@ -13,7 +13,7 @@ def setup(bot):
     set_up(bot)
 
 
-@sopel.module.rate(60)
+@sopel.module.rate(5)
 @sopel.module.commands('hero')
 def hero(bot, trigger):
     hero_command(bot, trigger)
